@@ -65,6 +65,13 @@ var keyMap = {
   40: 'down'
 };
 
+// map of IE 10 pointer events
+var pointerMap = {
+  2: 'touch',
+  3: 'touch', // treat pen like touch
+  4: 'mouse'
+};
+
 // touch buffer timer
 var timer;
 
@@ -92,9 +99,9 @@ function setInput(event) {
   var eventKey = key(event);
   var eventTarget = target(event);
   var value = inputMap[event.type];
+  if (value === 'pointer') value = pointerType(event);
 
   if (currentInput !== value) {
-
     if (
       // only if the user flag isn't set
       !formTyping &&
@@ -131,6 +138,10 @@ function target(event) {
   return event.target || event.srcElement;
 }
 
+function pointerType(event) {
+  return (typeof event.pointerType === 'number') ? pointerMap[event.pointerType] : event.pointerType;
+}
+
 // keyboard logging
 function logKeys(eventKey) {
   if (activeKeys.indexOf(keyMap[eventKey]) === -1 && keyMap[eventKey]) activeKeys.push(keyMap[eventKey]);
@@ -152,9 +163,6 @@ function unLogKeys(event) {
 
   var mouseEvent = 'mousedown';
 
-  // touch
-  if ('ontouchstart' in document.documentElement) body.addEventListener('touchstart', bufferInput);
-
   // pointer/mouse
   if (window.PointerEvent) {
     mouseEvent = 'pointerdown';
@@ -163,6 +171,9 @@ function unLogKeys(event) {
   }
 
   body.addEventListener(mouseEvent, immediateInput);
+
+  // touch
+  if ('ontouchstart' in document.documentElement) body.addEventListener('touchstart', bufferInput);
 
   // keyboard
   body.addEventListener('keydown', immediateInput);
