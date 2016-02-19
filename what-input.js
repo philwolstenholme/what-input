@@ -1,4 +1,4 @@
-var whatInput = (function() {
+window.whatInput = (function() {
 
   'use strict';
 
