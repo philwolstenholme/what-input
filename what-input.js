@@ -1,14 +1,4 @@
-;(function(root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define([], function() {
-      return (factory());
-    });
-  } else if (typeof exports === 'object') {
-    module.exports = factory();
-  } else {
-    root.whatInput = factory();
-  }
-} (this, function() {
+var whatInput = (function() {
 
   'use strict';
 
@@ -43,14 +33,14 @@
 
   // mapping of events to input types
   var inputMap = {
-    'keydown': 'keyboard',
-    'mousedown': 'mouse',
-    'mousemove': 'mouse',
+    'keydown'      : 'keyboard',
+    'mousedown'    : 'mouse',
+    'mousemove'    : 'mouse',
     'MSPointerDown': 'pointer',
     'MSPointerMove': 'pointer',
-    'pointerdown': 'pointer',
-    'pointermove': 'pointer',
-    'touchstart': 'touch'
+    'pointerdown'  : 'pointer',
+    'pointermove'  : 'pointer',
+    'touchstart'   : 'touch'
   };
 
   // add correct mouse wheel event mapping to `inputMap`
@@ -61,7 +51,7 @@
 
   // mapping of key codes to common name
   var keyMap = {
-    9: 'tab',
+    9 : 'tab',
     13: 'enter',
     16: 'shift',
     27: 'esc',
@@ -131,14 +121,18 @@
       ) {
         // ignore keyboard typing on form elements
       } else {
-        currentInput = value;
-        body.setAttribute('data-whatinput', currentInput);
-
-        if (inputTypes.indexOf(currentInput) === -1) inputTypes.push(currentInput);
+        switchInput(value);
       }
     }
 
     if (value === 'keyboard') logKeys(eventKey);
+  }
+
+  function switchInput(string) {
+    currentInput = string;
+    body.setAttribute('data-whatinput', currentInput);
+
+    if (inputTypes.indexOf(currentInput) === -1) inputTypes.push(currentInput);
   }
 
   function key(event) {
@@ -249,7 +243,7 @@
     types: function() { return inputTypes; },
 
     // accepts string: manually set the input type
-    set: setInput
+    set: switchInput
   };
 
-}));
+})();
