@@ -1,14 +1,4 @@
-;(function(root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define([], function() {
-      return (factory());
-    });
-  } else if (typeof exports === 'object') {
-    module.exports = factory();
-  } else {
-    root.whatInput = factory();
-  }
-} (this, function() {
+window.whatInput = (function() {
 
   'use strict';
 
@@ -45,6 +35,14 @@
   // via https://developer.mozilla.org/en-US/docs/Web/Events/wheel
   var mouseWheel = detectWheel();
 
+  // list of modifier keys commonly used with the mouse and
+  // can be safely ignored to prevent false keyboard detection
+  var ignoreMap = [
+    16, // shift
+    17, // control
+    18  // alt
+  ];
+
   // mapping of events to input types
   var inputMap = {
     'keydown': 'keyboard',
@@ -64,7 +62,7 @@
   // array of all used input types
   var inputTypes = [];
 
-  // mapping of key codes to common name
+  // mapping of key codes to a common name
   var keyMap = {
     9: 'tab',
     13: 'enter',
@@ -130,7 +128,7 @@
       var eventTargetType = (eventTargetNode === 'input') ? eventTarget.getAttribute('type') : null;
 
       if (
-        // only if the user flag to allow typing in form fields isn't set
+        (// only if the user flag to allow typing in form fields isn't set
         !body.hasAttribute('data-whatinput-formtyping') &&
 
         // only if currentInput has a value
@@ -147,9 +145,12 @@
            eventTargetNode === 'textarea' ||
            eventTargetNode === 'select' ||
            (eventTargetNode === 'input' && nonTypingInputs.indexOf(eventTargetType) < 0)
+        )) || (
+          // ignore modifier keys
+          ignoreMap.indexOf(eventKey) > -1
         )
       ) {
-        // ignore keyboard typing on form elements
+        // ignore keyboard typing
       } else {
         switchInput(value);
       }
@@ -218,7 +219,7 @@
     // mouse wheel
     body.addEventListener(mouseWheel, bufferedEvent);
 
-    // keyboard
+    // keyboard events
     body.addEventListener('keydown', unBufferedEvent);
     body.addEventListener('keyup', unBufferedEvent);
     document.addEventListener('keyup', unLogKeys);
@@ -289,4 +290,4 @@
     set: switchInput
   };
 
-}));
+}());
